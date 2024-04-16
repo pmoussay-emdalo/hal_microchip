@@ -31,22 +31,33 @@
 #ifndef RISCV_BITS_H
 #define RISCV_BITS_H
 
+#ifdef __ZEPHYR__
+#include<zephyr/arch/riscv/csr.h>
+#include<zephyr/sys/util.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define likely(x) __builtin_expect((x), 1)
-#define unlikely(x) __builtin_expect((x), 0)
+#ifndef __GNUC__
+# define likely(x) __builtin_expect((x), 1)
+# define unlikely(x) __builtin_expect((x), 0)
+#endif
 
 #define ROUNDUP(a, b) ((((a)-1)/(b)+1)*(b))
 #define ROUNDDOWN(a, b) ((a)/(b)*(b))
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define CLAMP(a, lo, hi) MIN(MAX(a, lo), hi)
+#ifndef __ZEPHYR__
+# define MAX(a, b) ((a) > (b) ? (a) : (b))
+# define MIN(a, b) ((a) < (b) ? (a) : (b))
+# define CLAMP(a, lo, hi) MIN(MAX(a, lo), hi)
+#endif
 
-#define EXTRACT_FIELD(val, which) (((val) & (which)) / ((which) & ~((which)-1)))
-#define INSERT_FIELD(val, which, fieldval) (((val) & ~(which)) | ((fieldval) * ((which) & ~((which)-1))))
+#ifndef __ZEPHYR__
+# define EXTRACT_FIELD(val, which) (((val) & (which)) / ((which) & ~((which)-1)))
+# define INSERT_FIELD(val, which, fieldval) (((val) & ~(which)) | ((fieldval) * ((which) & ~((which)-1))))
+#endif
 
 #define STR(x) XSTR(x)
 #define XSTR(x) #x

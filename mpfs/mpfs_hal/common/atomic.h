@@ -36,13 +36,19 @@
 extern "C" {
 #endif
 
+#ifdef __ZEPHYR__
+#include <zephyr/sys/atomic_builtin.h>
+#endif
+
 #define mb() __asm__ volatile ("fence" ::: "memory")
-#define atomic_set(ptr, val) (*(volatile typeof(*(ptr)) *)(ptr) = val)
-#define atomic_read(ptr) (*(volatile typeof(*(ptr)) *)(ptr))
+// #define atomic_set(ptr, val) (*(volatile typeof(*(ptr)) *)(ptr) = val)
+// #define atomic_read(ptr) (*(volatile typeof(*(ptr)) *)(ptr))
 
 #ifdef __riscv_atomic
 # define atomic_swap(ptr, swp) __sync_lock_test_and_set(ptr, swp)
-# define atomic_or(ptr, inc) __sync_fetch_and_or(ptr, inc)
+# ifndef __ZEPHYR__
+#  define atomic_or(ptr, inc) __sync_fetch_and_or(ptr, inc)
+# endif
 #else
 #define atomic_binop(ptr, inc, op) ({ \
   long flags = disable_irqsave(); \
